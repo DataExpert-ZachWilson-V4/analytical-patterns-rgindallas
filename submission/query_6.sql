@@ -4,7 +4,6 @@
 --
 -- team_abbreviation	max_wins_over_90_games
 -- GSW	                    80
---
 -- Deduplicating nba_game_details table to ensure unique player entries per game
 WITH nba_game_details_deduped AS (
     SELECT DISTINCT
