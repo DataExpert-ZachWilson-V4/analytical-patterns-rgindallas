@@ -1,20 +1,21 @@
---
--- Query 4: Which player scored the most points in one season?
---
--- player_name	season	max_points
--- Kevin Durant	2013	3265
---
-SELECT
-    player_name,
-    season,
-    MAX(total_points) AS max_points
-FROM
-    rgindallas.nba_grouping_sets
-WHERE
-    aggregation_level = 'player_season'
-GROUP BY
-    player_name,
-    season
-ORDER BY
-    max_points DESC
+/*
+Build additional queries on top of the results of the `GROUPING SETS` aggregations above to answer the following questions:
+  - Write a query (`query_3`) to answer: "Which player scored the most points playing for a single team?"
+  - Write a query (`query_4`) to answer: "Which player scored the most points in one season?"
+  - Write a query (`query_5`) to answer: "Which team has won the most games"
+
+*/
+
+-- query from the dashboard dataset created in Query 2
+SELECT player, season, total_points
+FROM harathi.nba_games_details_board
+WHERE aggregation_level = 'player_and_season'
+ORDER BY total_points DESC 
 LIMIT 1
+
+/*
+Results:
+
+player	        season	total_points
+Kevin Durant	2013	3265
+*/
