@@ -9,7 +9,7 @@ SELECT
     team_abbreviation,
     MAX(total_points) AS max_points
 FROM
-    jlcharbneau.nba_grouping_sets
+    rgindallas.nba_grouping_sets
 WHERE
     aggregation_level = 'player_team'
 GROUP BY
