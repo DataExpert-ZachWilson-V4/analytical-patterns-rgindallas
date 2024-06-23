@@ -44,4 +44,3 @@ SELECT team_abbreviation, MAX(win_streak_90_games) as max_games_won_90_day_stret
 FROM streaks
 GROUP BY team_id, team_abbreviation
 ORDER BY max_games_won_90_day_stretch DESC
-LIMIT 1
