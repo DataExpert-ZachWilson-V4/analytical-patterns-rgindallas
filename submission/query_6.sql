@@ -25,10 +25,8 @@ combined AS (
     FROM bootcamp.nba_games g 
     JOIN nba_game_details_deduped gd ON g.game_id = gd.game_id AND gd.row_number = 1
     GROUP BY 
-        gd.game_id, 
-        gd.team_id,
-        gd.team_abbreviation,
-        g.game_date_est
+        gd.game_id,
+        gd.team_abbreviation
     ),
 
 streaks AS (
@@ -38,6 +36,7 @@ streaks AS (
             ROWS BETWEEN 89 PRECEDING AND CURRENT ROW
         ) AS win_streak_90_games
     FROM combined
+    WHERE game_date_est IS NOT NULL
 )
 
 SELECT team_abbreviation, MAX(win_streak_90_games) as max_games_won_90_day_stretch
