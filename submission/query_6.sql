@@ -1,5 +1,5 @@
 -- Calculating cumulative wins and rolling 90-game wins for each team
-team_game_results AS (
+WITH team_game_results AS (
     SELECT
         ngd.team_id,
         ngd.game_id,
