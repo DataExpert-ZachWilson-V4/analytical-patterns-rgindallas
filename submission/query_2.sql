@@ -1,34 +1,38 @@
---Create function to perform aggregations of the nba_game_detials
-CREATE OR REPLACE FUNCTION aggregate_game_details(game_details TABLE, games TABLE) RETURNS TABLE AS
-BEGIN
-    RETURN (
-        SELECT     
-            COALESCE(gd.player_name, 'Overall') AS player,
-            COALESCE(gd.team_abbreviation, 'Overall') AS team,
-            COALESCE(CAST(g.season AS VARCHAR), 'Overall') AS season,
-            CASE   
-                WHEN GROUPING(gd.player_name, gd.team_abbreviation) = 0 THEN 'player_team'
-                WHEN GROUPING(gd.player_name, g.season) = 0 THEN 'player_season'
-                WHEN GROUPING(gd.team_abbreviation) = 0 THEN 'team'
-            END AS grouping_type,
-            SUM(gd.pts) AS total_points,
-            SUM(IF(
-                (gd.team_id = g.home_team_id AND g.home_team_wins = 1) OR
-                (gd.team_id = g.visitor_team_id AND g.home_team_wins = 0),
-                1,
-                0
-            )) AS wins
-        FROM (
-            SELECT *,
-                ROW_NUMBER() OVER(PARTITION BY game_id, team_id, player_id ORDER BY game_date_est) AS row_num
-            FROM game_details
-        ) AS gd
-        JOIN games AS g ON gd.game_id = g.game_id
-        WHERE gd.row_num = 1
-        GROUP BY GROUPING SETS( 
-            (player_name, team_abbreviation),
-            (player_name, season),
-            (team_abbreviation)
-        )
-    )
-END
+/*
+Write a query (`query_2`) that uses `GROUPING SETS` to perform aggregations of the `nba_game_details` data. Create slices that aggregate along the following combinations of dimensions:
+  - player and team
+  - player and season
+  - team
+
+*/
+
+-- CTAS to create a dataset for dashboard analytics
+CREATE OR REPLACE TABLE rgindallas.nba_games_details_board AS
+SELECT
+    CASE 
+        WHEN GROUPING(games_details_deduped.player_name) = 0 AND GROUPING(games_details_deduped.team_abbreviation) = 0 THEN 'player_and_team'
+        WHEN GROUPING(games_details_deduped.player_name) = 0 AND GROUPING(games.season) = 0 THEN 'player_and_season'
+        WHEN GROUPING(games_details_deduped.team_abbreviation) = 0 THEN 'team'
+        ELSE 'Overall'
+    END as aggregation_level,
+    COALESCE(games_details_deduped.player_name, 'Overall') AS player, 
+    COALESCE(games_details_deduped.team_abbreviation, 'Overall') AS team,
+    COALESCE(CAST(games.season AS VARCHAR), 'Overall') AS season,
+    SUM(games_details_deduped.pts) AS total_points,
+    SUM(
+        CASE 
+            WHEN games_details_deduped.team_id = games.home_team_id AND games.home_team_wins = 1 THEN 1
+            WHEN games_details_deduped.team_id = games.visitor_team_id AND games.home_team_wins = 0 THEN 1
+            ELSE 0
+        END
+    ) AS won_games 
+FROM bootcamp.nba_game_details_dedup AS games_details_deduped
+JOIN bootcamp.nba_games AS games
+  ON games_details_deduped.game_id = games.game_id
+GROUP BY GROUPING SETS (
+  (games_details_deduped.player_name, games_details_deduped.team_abbreviation),
+  (games_details_deduped.player_name, games.season),
+  (games_details_deduped.team_abbreviation)
+)
+
+-- 18729 rows
