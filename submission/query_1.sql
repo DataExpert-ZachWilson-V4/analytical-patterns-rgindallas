@@ -1,6 +1,6 @@
 WITH yesterday AS (
     SELECT *
-    FROM rgindallas.nba_players_state_tracking
+    FROM bootcamp.nba_players_state_tracking
     WHERE current_season = 1996
 ),
 today AS (
