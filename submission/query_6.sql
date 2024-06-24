@@ -4,7 +4,6 @@ WITH nba_game_details_deduped AS (
         *,
         ROW_NUMBER() OVER (PARTITION BY game_id, team_id, player_id) row_number
     FROM bootcamp.nba_game_details
-    WHERE game_date_est IS NOT NULL
 ),
 
 -- Combine game details with game results
@@ -20,6 +19,7 @@ combined AS (
         END AS team_won_game
     FROM bootcamp.nba_games g 
     JOIN nba_game_details_deduped gd ON g.game_id = gd.game_id AND gd.row_number = 1
+    WHERE g.game_date_est IS NOT NULL
 ),
 
 -- Calculate total games won in a 90-game stretch
