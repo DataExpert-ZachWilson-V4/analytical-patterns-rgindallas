@@ -16,7 +16,7 @@ combined AS (
         gd.game_id,
         gd.team_id,
         gd.team_abbreviation,
-        g.game_date_est,
+        gd.game_date_est,
         MAX(CASE 
             WHEN gd.team_id = g.home_team_id AND g.home_team_wins = 1 THEN 1   
             WHEN gd.team_id = g.visitor_team_id AND g.home_team_wins = 0 THEN 1 
