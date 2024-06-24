@@ -21,6 +21,7 @@ WITH lebron_games AS (
         academy.bootcamp.nba_game_details
     WHERE
         player_name = 'LeBron James' -- Filtering for games played by LeBron James
+        AND pts IS NOT NULL
 ),
 
 streaks AS (
@@ -67,5 +68,7 @@ SELECT
     MAX(streak_length) AS max_streak_length -- Maximum streak length where LeBron scored over 10 points
 FROM
     streak_lengths
+WHERE
+    over_10_points = 1 -- Only consider the games where LeBron scored over 10 points
 GROUP BY
     player_name
