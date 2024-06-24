@@ -14,7 +14,6 @@ WITH nba_game_details_deduped AS (
 combined AS (
     SELECT
         gd.game_id,
-        gd.team_id,
         gd.team_abbreviation,
         g.game_date_est,
         MAX(CASE 
@@ -26,7 +25,7 @@ combined AS (
     JOIN nba_game_details_deduped gd ON g.game_id = gd.game_id AND gd.row_number = 1
     GROUP BY 
         gd.game_id,
-        gd.team_id,
+        g.game_date_est,
         gd.team_abbreviation
     ),
 
