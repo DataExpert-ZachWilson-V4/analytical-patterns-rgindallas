@@ -14,6 +14,7 @@ WITH nba_game_details_deduped AS (
 combined AS (
     SELECT
         gd.game_id,
+        gd.team_id,
         gd.team_abbreviation,
         g.game_date_est,
         MAX(CASE 
@@ -25,21 +26,22 @@ combined AS (
     JOIN nba_game_details_deduped gd ON g.game_id = gd.game_id AND gd.row_number = 1
     GROUP BY 
         gd.game_id,
-        g.game_date_est,
+        gd.game_date_est,
+        gd.team_id,
         gd.team_abbreviation
     ),
 
 streaks AS (
     SELECT *,
         SUM(team_won_game) OVER (
-            PARTITION BY team_id ORDER BY game_date_est 
+            PARTITION BY team_abbreviation ORDER BY game_date_est 
             ROWS BETWEEN 89 PRECEDING AND CURRENT ROW
         ) AS win_streak_90_games
     FROM combined
     WHERE game_date_est IS NOT NULL
 )
 
-SELECT team_abbreviation, MAX(win_streak_90_games) as max_games_won_90_day_stretch
+SELECT team_id, team_abbreviation, MAX(win_streak_90_games) as max_games_won_90_day_stretch
 FROM streaks
 GROUP BY team_id, team_abbreviation
 ORDER BY max_games_won_90_day_stretch DESC
