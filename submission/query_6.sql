@@ -14,9 +14,8 @@ WITH nba_game_details_deduped AS (
 combined AS (
     SELECT
         gd.game_id,
-        gd.team_id,
         gd.team_abbreviation,
-        gd.game_date_est,
+        g.game_date_est,
         MAX(CASE 
             WHEN gd.team_id = g.home_team_id AND g.home_team_wins = 1 THEN 1   
             WHEN gd.team_id = g.visitor_team_id AND g.home_team_wins = 0 THEN 1 
@@ -26,8 +25,7 @@ combined AS (
     JOIN nba_game_details_deduped gd ON g.game_id = gd.game_id AND gd.row_number = 1
     GROUP BY 
         gd.game_id,
-        gd.game_date_est,
-        gd.team_id,
+        g.game_date_est,
         gd.team_abbreviation
     ),
 
@@ -41,7 +39,7 @@ streaks AS (
     WHERE game_date_est IS NOT NULL
 )
 
-SELECT team_id, team_abbreviation, MAX(win_streak_90_games) as max_games_won_90_day_stretch
+SELECT team_abbreviation, MAX(win_streak_90_games) as max_games_won_90_day_stretch
 FROM streaks
-GROUP BY team_id, team_abbreviation
+GROUP BY team_abbreviation
 ORDER BY max_games_won_90_day_stretch DESC
