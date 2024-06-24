@@ -26,6 +26,7 @@ combined AS (
     JOIN nba_game_details_deduped gd ON g.game_id = gd.game_id AND gd.row_number = 1
     GROUP BY 
         gd.game_id,
+        gd.team_id,
         gd.team_abbreviation
     ),
 
